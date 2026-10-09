@@ -17,8 +17,9 @@ My [resume](/files/resume.pdf) was last updated 2026-10-08.
 
 ## Outside of work
 
-- I've recently gotten into Magic The Gathering, mostly Commander.
-Here are some [unmanicured decks](https://archidekt.com/folders/1149505).
+- I've been playing a lot of Magic: The Gathering lately. Here are some of
+my [unmanicured Commander decks](https://archidekt.com/folders/1149505).
 
-- I used to be a reasonably competitive World of Warcraft Classic raider.
-My guild's Icecrown Citadel speed run ranked 111th in the world.
+- I used to raid in World of Warcraft Classic a little bit too much. My
+guild's Icecrown Citadel speed run ranked in the top 125 worldwide. Looking
+forward to WoW Forever!
