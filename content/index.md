@@ -8,8 +8,8 @@
 
 I'm a senior software engineer at NVIDIA in New York, where I build
 distributed ML infrastructure for the large multi-modal foundation models
-behind autonomous vehicles. My work covers the whole model lifecycle: the
-curation and enrichment pipelines that feed training, the training and
+behind autonomous vehicles. My work has touched the whole model lifecycle:
+the curation and enrichment pipelines that feed training, the training and
 evaluation frameworks that ML engineers build on, and large-scale GPU
 inference for finding corner cases.
 
