@@ -23,6 +23,21 @@
   .intro h1, .intro p { margin: 0; }
   pre { overflow-x: auto; padding: 10px; background: #f4f4f4; }
   code { font-size: 0.9em; }
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    border-collapse: collapse;
+    font-size: 0.85em;
+    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+  }
+  th, td { padding: 0.55em 0.9em; text-align: left; vertical-align: top; }
+  th { font-weight: 600; color: #222; border-bottom: 2px solid #ccc; white-space: nowrap; }
+  td { border-bottom: 1px solid #e3e3e3; }
+  tbody tr:last-child td { border-bottom: 2px solid #ccc; }
+  tbody tr:hover { background: #f7f7f7; }
   nav a { margin-right: 1em; white-space: nowrap; }
   .meta { color: #777; font-size: 0.85em; }
   .posts { list-style: none; padding: 0; }
@@ -32,6 +47,10 @@
     a { color: #58a6ff; }
     a:visited { color: #8e96f0; }
     pre { background: #161b22; }
+    th { color: #e6edf3; border-bottom-color: #30363d; }
+    td { border-bottom-color: #21262d; }
+    tbody tr:last-child td { border-bottom-color: #30363d; }
+    tbody tr:hover { background: #161b22; }
     .meta, footer { color: #8b949e; }
   }
 </style>

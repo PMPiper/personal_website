@@ -13,7 +13,7 @@ the curation and enrichment pipelines that feed training, the training and
 evaluation frameworks that ML engineers build on, and large-scale GPU
 inference for finding corner cases.
 
-My [resume](/files/resume.pdf) was last updated 2026-10-08.
+My [resume](/files/resume.pdf) on this site may not be up to date.
 
 ## Outside of work
 
@@ -21,5 +21,5 @@ My [resume](/files/resume.pdf) was last updated 2026-10-08.
 my [unmanicured Commander decks](https://archidekt.com/folders/1149505).
 
 - I used to raid in World of Warcraft Classic a little bit too much. My
-guild's Icecrown Citadel speed run ranked in the top 125 worldwide. Looking
-forward to WoW Forever!
+guild's Icecrown Citadel speed run ranked in the top 125 worldwide. You'll
+probably find me on WoW Forever soon.
