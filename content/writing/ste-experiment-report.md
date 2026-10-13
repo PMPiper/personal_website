@@ -1,10 +1,10 @@
 created: 2026-10-12
 
-# Testing a writing-style prompt on a coding agent
+# Testing a writing-style prompt on a coding agent [DRAFT]
 
-This is the technical companion to [What does "80% of the way to ASD-STE100" actually do?](/writing/ste-jargon-post/). That post shows what the outputs look like and what I'd try. This one covers how the experiment was set up, what was measured, and what didn't work.
+This is the technical companion to [What does "80% of the way to ASD-STE100" actually do?](/writing/ste-jargon-post/). That post is a simple show of what the outputs look like. This one covers how the experiment was set up, what was measured, and what didn't work.
 
-The short version of the result: asking Claude Code to write "X% of the way to ASD-STE100" behaves like a switch rather than a dial, does not shorten the output, and does not move the meaning. The agent also never produced the dense prose I set out to remove, on any of three tasks, which limits what the experiment can say.
+TL;DR: asking Claude Code to write "X% of the way to ASD-STE100" behaves like a switch rather than a dial, does not shorten the output, and does not move the meaning. The agent also never produced the dense prose I set out to remove in the first place.
 
 ## 1. Question and design
 
@@ -14,9 +14,17 @@ ASD-STE100 Simplified Technical English (STE) is a controlled language from aero
 2. Does the meaning survive, or does the agent drop the hard parts to keep sentences short?
 3. Does it remove dense, abstract prose in the kinds of document where that prose shows up?
 
-The design is a grid. One run is one fresh agent session that explores a repository and writes one answer.
+**What a run is.** One *run* is one fresh, headless Claude Code session. It starts in a checkout of Beam with a single prompt, explores the code with read-only tools, and writes one answer. Nothing carries over from one run to the next. I save the answer and the full transcript, and everything below is measured on the answers.
 
-| Factor | Values |
+Three choices define a run:
+
+- the **task**: what kind of document the prompt asks for
+- the **subsystem**: which part of Beam it is about
+- the **STE level**: the style sentence at the end of the prompt
+
+A *cell* is one subsystem at one level, for example "Coders at 80%". That makes 3 subsystems × 5 levels = 15 cells per task. A *repeat* is another run of the same cell with the identical prompt. Repeats show how much two answers differ by chance, which is the noise floor I compare the levels against. The run order was shuffled with a fixed seed, so no level ran all at once.
+
+| Params | Values |
 |---|---|
 | Agent | Claude Code 2.1.296, headless (`claude -p`) |
 | Codebase | [Apache Beam](https://github.com/apache/beam) Python SDK, pinned at commit `fadfc78` |
@@ -24,7 +32,23 @@ The design is a grid. One run is one fresh agent session that explores a reposit
 | STE level | 0, 25, 50, 80, 100 |
 | Task | explanation, design document, handoff document |
 
-The only thing that changes between levels is one sentence at the end of the prompt. Level 0 has no sentence. Levels 25, 50, and 80 say "about X% of the way to ASD-STE100 Simplified Technical English". Level 100 says "in ASD-STE100 Simplified Technical English".
+This is the prompt for the explanation task. `{name}` and `{path}` come from the subsystem:
+
+```text
+You are in a checkout of Apache Beam. Explain how the {name} subsystem in
+sdks/python/apache_beam/{path} works to an experienced software engineer who
+has never used Beam. Cover what problem it solves, the main classes and how
+data flows through them, and anything surprising. Only read code under
+sdks/python. Do not modify any files.
+```
+
+The only thing that changes between levels is one sentence at the end:
+
+- Level 0: no sentence.
+- Levels 25, 50, and 80: "Write your explanation about X% of the way to ASD-STE100 Simplified Technical English."
+- Level 100: "Write your explanation in ASD-STE100 Simplified Technical English."
+
+The two document tasks use the same structure with a different request:
 
 | Task | Model and effort | Runs | The prompt asks for |
 |---|---|---|---|
@@ -44,9 +68,9 @@ I picked Beam because I needed a codebase I didn't know, big enough that the age
 
 ## 2. Isolating the agent
 
-The result only means something if nothing else tells the agent how to write. There were two places a style preference could leak in: the target repository and my own Claude Code setup.
+We needed to totally isolate the agent and prompt from style preferences. The target repository and my own Claude Code setup were two places there could be leakage.
 
-**The repository.** Beam ships an `.agent/skills/` folder with 13 skills, including a `beam-concepts` cheat sheet. Claude Code doesn't auto-load that folder, but the agent could find it while exploring, and a pre-written concept guide would shape exactly the wording I'm trying to measure. So the harness deletes it with one local commit, then scans every tracked file for other agent instructions (`CLAUDE.md`, `AGENTS.md`, `.cursor/`, `SKILL.md`, and so on) and refuses to run if it finds one. It found none. Before every run the checkout is reset, and after every run `git status` must be empty or the run is thrown out.
+**The repository.** Beam ships an `.agent/skills/` folder with 13 skills, including a `beam-concepts` cheat sheet. Claude Code doesn't auto-load that folder, but the agent could find it while exploring, and a pre-written concept guide would shape exactly the wording I'm trying to measure. So the harness deletes it with one local commit, then scans every tracked file for other agent instructions (`CLAUDE.md`, `AGENTS.md`, `.cursor/`, `SKILL.md`, and so on) and refuses to run if it finds one. Before every run the checkout is reset, and after every run `git status` must be empty or the run is thrown out.
 
 **My setup.** I have a CLAUDE.md, memory, and skills. Every run used:
 
@@ -79,7 +103,7 @@ All 75 runs passed these checks on the first attempt.
 
 ## 3. Running it on a $20 plan
 
-I ran all of this on a $20-a-month Pro plan, not an API key, and that shaped the experiment more than I expected. On a subscription the limit isn't dollars. It is a five-hour usage window, plus a weekly one, and every headless run draws on the same windows as my normal use.
+I ran all of this on a $20-a-month Pro plan, not an API key. On a subscription the limit often isn't dollars, it is a five-hour usage window, plus a weekly one, and every headless run draws on the same windows as my normal use.
 
 | Task and model | Cost per run at API prices | Share of the five-hour window per run |
 |---|---|---|
@@ -88,17 +112,15 @@ I ran all of this on a $20-a-month Pro plan, not an API key, and that shaped the
 | Handoff document, Sonnet 5.5 at high effort | about $0.72 | about 6-7% |
 | Design document, Opus 5.5 at high effort (3 test runs) | about $1.00 | about 4.5% |
 
-The dollar column is what Claude Code reports each run would have cost on the API. The window column is rougher: it is read from the usage figure each run reports, and the session I used to build and babysit the harness was drawing on the same window.
+The dollar column is what Claude Code reports each run would have cost on the API. The window column is rougher since it is read from the usage figure each run reports, and the session I used to build and babysit the harness was drawing on the same window. The total is ~$32 at API prices.
 
-Added up, the runs come to about $32 at API prices, but the dollars were never the constraint. The windows were:
+The windows are why the experiment is the size it is:
 
 - I planned five repeats per cell for the explanation task and ran three, because three fit in one window and still gave a noise floor.
 - I wanted Opus for the document tasks and used Sonnet. A 45-run Opus batch would have needed about two windows.
 - The document tasks have one run per cell for the same reason. Those 30 runs took parts of three windows over two days.
 
 Two harness features exist only because of this. `--stop-at-usage` ends a batch at a set share of the window, so there is room left to analyze what ran. `--by-repeat` finishes one repeat of every cell before starting the next, so a batch that stops early is still a balanced design. A stopped batch resumes with the same command and skips the cells that already finished.
-
-If you want to try this on the same plan: budget by window, not by dollar. A small model at medium effort gets you a full grid in an afternoon. High effort turns the same grid into a multi-day job. [[TODO: your own take -- was the plan enough, and what would you do differently with an API budget?]]
 
 ## 4. Measures
 
@@ -121,7 +143,7 @@ If you want to try this on the same plan: budget by window, not by dollar. A sma
 
 ## 5. Results: the explanation task
 
-45 runs, 9 per level.
+45 runs, 9 per level (3 subsystems × 3 repeats).
 
 | Measure | 0% | 25% | 50% | 80% | 100% |
 |---|---|---|---|---|---|
@@ -177,7 +199,7 @@ The explanation results left a hole. The prose I wanted to get rid of looks like
 
 The full paragraph is four sentences of this. Scored with the dense-prose measures, it has 33% stacked noun phrases and 96 hyphenated compounds per 1,000 words. The 0% explanations had 7.0% and 23. The agent never wrote anything like it, so there was nothing for STE to fix.
 
-I see that style most in AI-written design docs and handoff docs, so I added those two tasks. This is one run per cell, so each column below is 3 runs.
+I see that style most in AI-written design docs and handoff docs, so I added those two tasks. This is one run per cell, so each column below is 3 runs, one per subsystem.
 
 Design document:
 
@@ -236,7 +258,7 @@ This is by no means exhaustive.
 - My sentence splitter counts list items and run-in labels like "Speed." as sentences, which pulls the average length down at every level.
 - "Files read" is parsed from shell commands, because the agent mostly reads through `sed -n`, `cat`, and `grep` rather than the Read tool. It is an approximation.
 - Claude has almost certainly seen Beam's source during training. That affects every level equally, but this is a test of explaining code it may partly know.
-- Embedding similarity is a proxy for meaning, not a guarantee. I have not read the explanations against the code for errors. [[TODO: if you do the blind ranking or the error check, add the result here.]]
+- Embedding similarity is a proxy for meaning, not a guarantee. I have not read the explanations against the code for errors.
 
 ## 9. What I'd do next
 
@@ -249,4 +271,4 @@ This is by no means exhaustive.
 
 ---
 
-*Reproducing this: the harness, prompts, metrics, and figures are at [github.com/PMPiper/asd-ste100-agent-exploration](https://github.com/PMPiper/asd-ste100-agent-exploration). [[TODO: say whether the raw transcripts are in the repo, once you have reviewed them.]] Claude Code 2.1.296. Model `claude-sonnet-5-5`, at medium effort for the explanation task and high effort for the document tasks. Beam commit `fadfc789376137afabab0469bf1e43a0f10a6ad0`. Runs on 2026-10-11 and 2026-10-12 (UTC).*
+*Reproducing this: the harness, prompts, metrics, and figures are at [github.com/PMPiper/asd-ste100-agent-exploration](https://github.com/PMPiper/asd-ste100-agent-exploration). Claude Code 2.1.296. Model `claude-sonnet-5-5`, at medium effort for the explanation task and high effort for the document tasks. Beam commit `fadfc789376137afabab0469bf1e43a0f10a6ad0`. Runs on 2026-10-11 and 2026-10-12 (UTC).*
