@@ -1,6 +1,6 @@
 created: 2026-10-12
 
-# Testing a writing-style prompt on a coding agent [DRAFT]
+# Testing a writing-style prompt on a coding agent [WIP]
 
 This is the technical companion to [What does "80% of the way to ASD-STE100" actually do?](/writing/ste-jargon-post/). That post is a simple show of what the outputs look like. This one covers how the experiment was set up, what was measured, and what didn't work.
 
