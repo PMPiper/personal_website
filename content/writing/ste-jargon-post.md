@@ -109,5 +109,3 @@ The 0% version assumes you know exactly what a shuffle and a spill file are. Eve
 ---
 
 *The harness, the isolation checks, the statistics, and the things that didn't work are in the [companion post](/writing/ste-experiment-report/). The code is at [github.com/PMPiper/asd-ste100-agent-exploration](https://github.com/PMPiper/asd-ste100-agent-exploration).*
-
-*[[TODO: optional one-line note on how you used Claude while writing this post.]]*
