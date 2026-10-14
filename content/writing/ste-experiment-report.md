@@ -1,6 +1,7 @@
 created: 2026-10-12
+status: draft
 
-# Testing a writing-style prompt on a coding agent [WIP]
+# Testing a writing-style prompt on a coding agent
 
 This is the technical companion to [What does "80% of the way to ASD-STE100" actually do?](/writing/ste-jargon-post/). That post is a simple show of what the outputs look like. This one covers how the experiment was set up, what was measured, and what didn't work.
 
@@ -272,3 +273,5 @@ This is by no means exhaustive.
 ---
 
 *Reproducing this: the harness, prompts, metrics, and figures are at [github.com/PMPiper/asd-ste100-agent-exploration](https://github.com/PMPiper/asd-ste100-agent-exploration). Claude Code 2.1.296. Model `claude-sonnet-5-5`, at medium effort for the explanation task and high effort for the document tasks. Beam commit `fadfc789376137afabab0469bf1e43a0f10a6ad0`. Runs on 2026-10-11 and 2026-10-12 (UTC).*
+
+*AI disclosure: this post was drafted with Claude Opus 5.5, using my own pre-AI writing as a reference. I reviewed and edited the final content before publishing.*

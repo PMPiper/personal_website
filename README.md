@@ -35,14 +35,18 @@ Add `content/writing/my-post.md`:
 ```markdown
 created: 2026-10-08
 updated: 2026-11-02
+status: draft
 
 # Title
 
 Body...
 ```
 
-`created` is required, `updated` is optional, and the blank line before the
-title matters. Put images in `static/images/` and PDFs in `static/files/`,
+`created` is required, `updated` and `status` are optional, and the blank
+line before the title matters. `status` is `published` (the default) or
+`draft`. A draft is still built and reachable by URL, but it is labelled as
+a draft and listed under a separate "Drafts" heading on `/writing/`. Remove
+the line to publish it. Put images in `static/images/` and PDFs in `static/files/`,
 and link them with absolute paths (`/images/foo.png`). A paper is just an
 entry whose body links to its PDF.
 

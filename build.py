@@ -12,12 +12,15 @@ Layout:
 
 A page's title is its first "# Heading" (the site name if it has none).
 Writing entries start with their
-dates, then a blank line, then the title:
+dates and status, then a blank line, then the title:
 
     created: 2026-10-08
     updated: 2026-11-02      (optional)
+    status: draft            (optional; "published" if omitted)
 
     # Title
+
+Drafts are still built, but are listed in their own section on /writing/.
 """
 import html
 import re
@@ -38,6 +41,7 @@ STATIC = ROOT / "static"
 OUT = ROOT / "_site"
 TEMPLATE = Template((ROOT / "template.html").read_text())
 TITLE_RE = re.compile(r"^# +(.+)$", re.MULTILINE)
+STATUSES = ("published", "draft")
 
 
 def split_title(text, fallback):
@@ -67,6 +71,14 @@ def time_tag(day):
     return f'<time datetime="{day}">{day}</time>'
 
 
+def post_list(entries):
+    items = "\n".join(
+        f'<li>{time_tag(created)} &mdash; <a href="/writing/{slug}/">{html.escape(title)}</a></li>'
+        for created, slug, title in sorted(entries, reverse=True)
+    )
+    return f'<ul class="posts">\n{items}\n</ul>'
+
+
 def build():
     shutil.rmtree(OUT, ignore_errors=True)
     shutil.copytree(STATIC, OUT, ignore=shutil.ignore_patterns(".DS_Store"))
@@ -77,7 +89,7 @@ def build():
         url_path = "" if src.stem == "index" else src.stem
         write_page(url_path, title, render(text)[0])
 
-    entries = []
+    entries = {status: [] for status in STATUSES}
     for src in (CONTENT / "writing").glob("*.md"):
         title, text = split_title(src.read_text(), src.stem)
         body, meta = render(text)
@@ -85,7 +97,13 @@ def build():
             sys.exit(f"{src.relative_to(ROOT)}: missing 'created: YYYY-MM-DD' at top of file")
         created = date.fromisoformat(meta["created"]).isoformat()
         updated = date.fromisoformat(meta.get("updated", created)).isoformat()
-        dates = f"Published {time_tag(created)}"
+        status = meta.get("status", "published").lower()
+        if status not in STATUSES:
+            sys.exit(f"{src.relative_to(ROOT)}: status must be one of {', '.join(STATUSES)}")
+        if status == "draft":
+            dates = f"Draft, not finished &middot; Started {time_tag(created)}"
+        else:
+            dates = f"Published {time_tag(created)}"
         if updated != created:
             dates += f" &middot; Updated {time_tag(updated)}"
         write_page(
@@ -93,14 +111,14 @@ def build():
             title,
             f'<h1>{html.escape(title)}</h1>\n<p class="meta">{dates}</p>\n{body}',
         )
-        entries.append((created, src.stem, title))
+        entries[status].append((created, src.stem, title))
 
-    items = "\n".join(
-        f'<li>{time_tag(created)} &mdash; <a href="/writing/{slug}/">{html.escape(title)}</a></li>'
-        for created, slug, title in sorted(entries, reverse=True)
-    )
-    write_page("writing", "Writing", f'<h1>Writing</h1>\n<ul class="posts">\n{items}\n</ul>')
-    print(f"Built {len(entries)} writing entries -> {OUT.relative_to(ROOT)}/")
+    listing = f'<h1>Writing</h1>\n{post_list(entries["published"])}'
+    if entries["draft"]:
+        listing += f'\n<h2>Drafts</h2>\n{post_list(entries["draft"])}'
+    write_page("writing", "Writing", listing)
+    total = sum(len(group) for group in entries.values())
+    print(f"Built {total} writing entries ({len(entries['draft'])} draft) -> {OUT.relative_to(ROOT)}/")
 
 
 def serve(port=8000):
