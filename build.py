@@ -20,7 +20,7 @@ dates and status, then a blank line, then the title:
 
     # Title
 
-Drafts are still built, but are listed in their own section on /writing/.
+Drafts are still built and reachable by URL, but are left off /writing/.
 """
 import html
 import re
@@ -113,12 +113,10 @@ def build():
         )
         entries[status].append((created, src.stem, title))
 
-    listing = f'<h1>Writing</h1>\n{post_list(entries["published"])}'
-    if entries["draft"]:
-        listing += f'\n<h2>Drafts</h2>\n{post_list(entries["draft"])}'
-    write_page("writing", "Writing", listing)
-    total = sum(len(group) for group in entries.values())
-    print(f"Built {total} writing entries ({len(entries['draft'])} draft) -> {OUT.relative_to(ROOT)}/")
+    write_page("writing", "Writing", f'<h1>Writing</h1>\n{post_list(entries["published"])}')
+    print(f"Built {len(entries['published'])} writing entries -> {OUT.relative_to(ROOT)}/")
+    for _, slug, _ in entries["draft"]:
+        print(f"  unlisted draft: /writing/{slug}/")
 
 
 def serve(port=8000):

@@ -45,10 +45,11 @@ Body...
 `created` is required, `updated` and `status` are optional, and the blank
 line before the title matters. `status` is `published` (the default) or
 `draft`. A draft is still built and reachable by URL, but it is labelled as
-a draft and listed under a separate "Drafts" heading on `/writing/`. Remove
-the line to publish it. Put images in `static/images/` and PDFs in `static/files/`,
-and link them with absolute paths (`/images/foo.png`). A paper is just an
-entry whose body links to its PDF.
+a draft and left off the list on `/writing/`. Remove the line to publish it.
+
+Put images in `static/images/` and PDFs in `static/files/`, and link them
+with absolute paths (`/images/foo.png`). A paper is just an entry whose body
+links to its PDF.
 
 The nav links live in `template.html`. The resume's "last updated" date is
 in `content/index.md`.
